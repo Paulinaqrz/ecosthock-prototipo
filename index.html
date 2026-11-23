@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EcoSthock | Gestión Inteligente de Caducidades</title>
+  <style>
+    :root {
+      --primary: #10b981;
+      --primary-dark: #059669;
+      --bg: #f3f4f6;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+    }
+    * { box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); }
+    header {
+      background: linear-gradient(135deg, #065f46, #10b981);
+      color: white; padding: 1.2rem 2rem; display: flex;
+      justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    header h1 { font-size: 1.5rem; display: flex; align-items: center; gap: 0.5rem; }
+    .tabs { display: flex; gap: 0.5rem; }
+    .tab-btn {
+      background: rgba(255,255,255,0.2); border: none; color: white;
+      padding: 0.6rem 1.2rem; border-radius: 8px; cursor: pointer; font-weight: 600;
+      transition: 0.2s;
+    }
+    .tab-btn.active { background: white; color: #065f46; }
+    main { max-width: 1100px; margin: 2rem auto; padding: 0 1rem; }
+    .stats {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem; margin-bottom: 2rem;
+    }
+    .stat-card {
+      background: var(--card); padding: 1.2rem; border-radius: 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05); border-left: 4px solid var(--primary);
+    }
+    .stat-card h3 { font-size: 0.85rem; color: var(--muted); text-transform: uppercase; }
+    .stat-card p { font-size: 1.8rem; font-weight: 700; margin-top: 0.3rem; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 2fr; gap: 1.5rem; }
+    @media (max-width: 800px) { .grid-2 { grid-template-columns: 1fr; } }
+    .panel {
+      background: var(--card); padding: 1.5rem; border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    .panel h2 { font-size: 1.15rem; margin-bottom: 1rem; color: #065f46; }
+    .form-group { margin-bottom: 0.9rem; }
+    label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.3rem; }
+    input, select {
+      width: 100%; padding: 0.6rem; border: 1px solid #d1d5db;
+      border-radius: 8px; font-size: 0.95rem;
+    }
+    .btn {
+      width: 100%; padding: 0.75rem; border: none; border-radius: 8px;
+      background: var(--primary); color: white; font-weight: 600; cursor: pointer;
+      font-size: 0.95rem; transition: 0.2s;
+    }
+    .btn:hover { background: var(--primary-dark); }
+    .btn-scan { background: #1f2937; margin-bottom: 1rem; }
+    .btn-scan:hover { background: #374151; }
+    table { width: 100%; border-collapse: collapse; margin-top: 0.5rem; }
+    th, td { text-align: left; padding: 0.75rem 0.5rem; border-bottom: 1px solid #e5e7eb; font-size: 0.9rem; }
+    th { color: var(--muted); font-weight: 600; }
+    .badge {
+      padding: 0.25rem 0.6rem; border-radius: 999px; font-size: 0.75rem; font-weight: 700;
+    }
+    .b-ok { background: #d1fae5; color: #065f46; }
+    .b-warn { background: #fef3c7; color: #92400e; }
+    .b-crit { background: #fee2e2; color: #991b1b; }
+    .b-offer { background: #dbeafe; color: #1e40af; }
+    .b-don { background: #f3e8ff; color: #6b21a8; }
+    .action-btn {
+      padding: 0.35rem 0.6rem; border: none; border-radius: 6px; font-size: 0.78rem;
+      font-weight: 600; cursor: pointer; margin-right: 0.2rem;
+    }
+    .btn-flash { background: #2563eb; color: white; }
+    .btn-donate { background: #7c3aed; color: white; }
+    .cards-market {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1.2rem;
+    }
+    .offer-card {
+      background: var(--card); border-radius: 12px; padding: 1.2rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1px solid #e5e7eb;
+    }
+    .price-old { text-decoration: line-through; color: var(--muted); font-size: 0.9rem; }
+    .price-new { color: var(--primary-dark); font-size: 1.4rem; font-weight: 800; }
+    .hidden { display: none; }
+    .toast {
+      position: fixed; bottom: 20px; right: 20px; background: #1f2937; color: white;
+      padding: 0.9rem 1.3rem; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      display: none; z-index: 100;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🌱 EcoSthock <span style="font-size:0.85rem;font-weight:400;opacity:0.9;">| Control Inteligente de Mermas</span></h1>
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchView('comercio', this)">🏪 Panel Comerciante</button>
+      <button class="tab-btn" onclick="switchView('consumidor', this)">🛒 Vista Consumidor / Banco</button>
+    </div>
+  </header>
+
+  <main>
+    <div class="stats">
+      <div class="stat-card">
+        <h3>Lotes Monitoreados</h3>
+        <p id="stat-total">0</p>
+      </div>
+      <div class="stat-card" style="border-color: var(--warning);">
+        <h3>Alertas (&lt; 72 hrs)</h3>
+        <p id="stat-alerts">0</p>
+      </div>
+      <div class="stat-card" style="border-color: #2563eb;">
+        <h3>Ofertas Flash Activas</h3>
+        <p id="stat-offers">0</p>
+      </div>
+      <div class="stat-card" style="border-color: #7c3aed;">
+        <h3>Ahorro / Rescate Estimado</h3>
+        <p id="stat-saved">$0</p>
+      </div>
+    </div>
+
+    <!-- VISTA COMERCIANTE -->
+    <section id="view-comercio" class="grid-2">
+      <div class="panel">
+        <h2>📷 Alta Rápida de Lote</h2>
+        <button type="button" class="btn btn-scan" onclick="simularEscaneo()">⚡ Simular Escaneo de Código QR/Barras</button>
+        <form onsubmit="agregarLote(event)">
+          <div class="form-group">
+            <label>Código de Barras</label>
+            <input type="text" id="codigo" required placeholder="Ej. 7501001234567" />
+          </div>
+          <div class="form-group">
+            <label>Producto</label>
+            <input type="text" id="nombre" required placeholder="Ej. Pan Integral Artesanal" />
+          </div>
+          <div class="form-group">
+            <label>Categoría</label>
+            <select id="categoria">
+              <option>Panadería</option>
+              <option>Lácteos</option>
+              <option>Frutas y Verduras</option>
+              <option>Abarrotes Perecederos</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Cantidad (Unidades) & Precio Base ($ MXN)</label>
+            <div style="display:flex; gap:0.5rem;">
+              <input type="number" id="cantidad" min="1" value="10" required />
+              <input type="number" id="precio" min="1" step="0.5" value="50" required />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Horas restantes para caducar</label>
+            <select id="horas">
+              <option value="24">24 horas (Crítico)</option>
+              <option value="48" selected>48 horas (Preventivo)</option>
+              <option value="72">72 horas (Alerta temprana)</option>
+              <option value="168">7 días (Vigente)</option>
+            </select>
+          </div>
+          <button type="submit" class="btn">Registrar en Inventario</button>
+        </form>
+      </div>
+
+      <div class="panel">
+        <h2>📦 Inventario y Alertas en Tiempo Real</h2>
+        <div style="overflow-x:auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>Producto</th>
+                <th>Cant.</th>
+                <th>Caducidad</th>
+                <th>Estado</th>
+                <th>Acciones Rápidas</th>
+              </tr>
+            </thead>
+            <tbody id="tabla-lotes"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- VISTA CONSUMIDOR -->
+    <section id="view-consumidor" class="hidden">
+      <div class="panel">
+        <h2>🔥 Ofertas Flash y Donaciones Disponibles Cerca de Ti</h2>
+        <p style="color:var(--muted); margin-bottom:1.2rem; font-size:0.9rem;">
+          Rescata alimentos en perfecto estado con descuentos dinámicos o gestiona recolección para bancos de alimentos.
+        </p>
+        <div id="market-grid" class="cards-market"></div>
+      </div>
+    </section>
+  </main>
+
+  <div id="toast" class="toast"></div>
+
+  <script>
+    let inventario = [
+      { id: 1, codigo: '7501001234567', nombre: 'Pan Integral Artesanal 600g', categoria: 'Panadería', cantidad: 12, precio: 55, horas: 48, estado: 'Oferta Flash', descuento: 40, comercio: 'Panadería La Espiga' },
+      { id: 2, codigo: '7501055300192', nombre: 'Yogurt Natural Griego 1L', categoria: 'Lácteos', cantidad: 8, precio: 68, horas: 24, estado: 'Alerta Crítica', descuento: 0, comercio: 'Abarrotes Don Pepe' },
+      { id: 3, codigo: '7502234119081', nombre: 'Paquete Croissants Mantequilla (6 pz)', categoria: 'Panadería', cantidad: 6, precio: 75, horas: 24, estado: 'Donación', descuento: 100, comercio: 'Cafetería Central' },
+      { id: 4, codigo: '7503009812344', nombre: 'Leche Fresca Pasteurizada 1L', categoria: 'Lácteos', cantidad: 20, precio: 32, horas: 168, estado: 'Vigente', descuento: 0, comercio: 'Mini Súper El Sol' }
+    ];
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.style.display = 'block';
+      setTimeout(() => t.style.display = 'none', 3000);
+    }
+
+    function switchView(view, btn) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('view-comercio').classList.toggle('hidden', view !== 'comercio');
+      document.getElementById('view-consumidor').classList.toggle('hidden', view !== 'consumidor');
+      render();
+    }
+
+    function simularEscaneo() {
+      const muestras = [
+{ c: '7501099881122', n: 'Baguette Rústico Recién Horneado', cat: 'Panadería', p: 38 },
+{ c: '7504411223344', n: 'Queso Panel Fresco 400g', cat: 'Lácteos', p: 64 },
+{ c: '7508877665544', n: 'Charola Fresas Frescas 500g', cat: 'Frutas y Verduras', p: 45 }
+];
+const item = muestras[Math.floor(Math.random() * muestras.length)];
+document.getElementById('codigo').value = item.c;
+document.getElementById('nombre').value = item.n;
+document.getElementById('categoria').value = item.cat;
+document.getElementById('precio').value = item.p;
+showToast('📷 Código leído correctamente');
+}
+function agregarLote(e) {
+e.preventDefault();
+const horas = parseInt(document.getElementById('horas').value);
+let estado = 'Vigente';
+if (horas <= 24) estado = 'Alerta Crítica';
+else if (horas <= 72) estado = 'Alerta Preventiva';
+inventario.unshift({
+id: Date.now(),
+codigo: document.getElementById('codigo').value,
+nombre: document.getElementById('nombre').value,
+categoria: document.getElementById('categoria').value,
+cantidad: parseInt(document.getElementById('cantidad').value),
+precio: parseFloat(document.getElementById('precio').value),
+horas,
+estado,
+descuento: 0,
+comercio: 'Mi Comercio Local'
+});
+e.target.reset();
+showToast('✅ Lote registrado y monitoreado');
+render();
+}
+function activarOferta(id) {
+const item = inventario.find(x => x.id === id);
+if (item) {
+item.estado = 'Oferta Flash';
+item.descuento = 40;
+showToast(🔥 Oferta Flash activada (-40%) para ${item.nombre});
+render();
+}
+}
+function activarDonacion(id) {
+const item = inventario.find(x => x.id === id);
+if (item) {
+item.estado = 'Donación';
+item.descuento = 100;
+showToast(💜 Lote canalizado a Banco de Alimentos);
+render();
+}
+}
+function reservarProducto(id) {
+const item = inventario.find(x => x.id === id);
+if (item && item.cantidad > 0) {
+item.cantidad -= 1;
+showToast(🎉 ¡Unidad reservada! Código QR generado para recolección.);
+render();
+}
+}
+function render() {
+const tbody = document.getElementById('tabla-lotes');
+const market = document.getElementById('market-grid');
+tbody.innerHTML = '';
+market.innerHTML = '';
+let alertas = 0, ofertas = 0, rescatado = 0;
+inventario.forEach(item => {
+if (item.horas <= 72 && item.estado !== 'Oferta Flash' && item.estado !== 'Donación') alertas++;
+if (item.estado === 'Oferta Flash') ofertas++;
+if (item.estado === 'Oferta Flash' || item.estado === 'Donación') {
+rescatado += item.precio * item.cantidad * (item.descuento / 100);
+}
+let badgeClass = 'b-ok';
+if (item.estado === 'Alerta Crítica') badgeClass = 'b-crit';
+else if (item.estado === 'Alerta Preventiva') badgeClass = 'b-warn';
+else if (item.estado === 'Oferta Flash') badgeClass = 'b-offer';
+else if (item.estado === 'Donación') badgeClass = 'b-don';
+tbody.innerHTML += `
+\({item.nombre}</strong><br><small style="color:#6b7280">\){item.codigo} · $${item.precio}
+${item.cantidad} u.${item.horas} hrs${item.estado}`;
+if ((item.estado === 'Oferta Flash' || item.estado === 'Donación') && item.cantidad > 0) {
+const finalPrice = (item.precio * (1 - item.descuento / 100)).toFixed(2);
+market.innerHTML += <div class="offer-card"> <span class="badge ${item.estado === 'Donación' ? 'b-don' : 'b-offer'}"> ${item.estado === 'Donación' ? '💜 Donación Banco de Alimentos' :🔥 -${item.descuento}% Oferta Flash} </span> <h3 style="margin:0.6rem 0 0.2rem;">${item.nombre}</h3> <p style="font-size:0.85rem;color:#6b7280;margin-bottom:0.8rem;">🏪 ${item.comercio} · Quedan ${item.cantidad} u.</p> <div style="margin-bottom:0.9rem;"> <span class="price-old">$${item.precio.toFixed(2)}</span> <span class="price-new"> $${finalPrice}</span> </div> <button class="btn" onclick="reservarProducto(${item.id})"> ${item.estado === 'Donación' ? 'Solicitar Recolección' : 'Reservar Oferta'} </button> </div> ;
+}
+});
+document.getElementById('stat-total').textContent = inventario.length;
+document.getElementById('stat-alerts').textContent = alertas;
+document.getElementById('stat-offers').textContent = ofertas;
+document.getElementById('stat-saved').textContent = $${rescatado.toFixed(0)};
+}
+render();
