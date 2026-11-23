@@ -1,211 +1,69 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>EcoSthock | Control Inteligente de Mermas</title>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
-    body { background-color: #f3f6f8; color: #1f2937; }
-    header { background: linear-gradient(90deg, #1b7a43, #239b56); color: white; padding: 14px 32px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
-    .brand { display: flex; align-items: center; gap: 10px; font-size: 1.3rem; font-weight: 700; }
-    .brand span { font-size: 0.85rem; font-weight: 400; opacity: 0.9; border-left: 1px solid rgba(255,255,255,0.4); padding-left: 10px; }
-    .nav-btns { display: flex; gap: 10px; }
-    .nav-btn { border: none; padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 0.9rem; transition: 0.2s; }
-    .nav-btn.active { background: white; color: #1b7a43; }
-    .nav-btn.inactive { background: rgba(255,255,255,0.18); color: white; }
-    .container { max-width: 1150px; margin: 24px auto; padding: 0 20px; }
-    .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
-    .kpi-card { background: white; padding: 18px 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border-left: 4px solid #1b7a43; }
-    .kpi-card.warn { border-left-color: #f59e0b; }
-    .kpi-card.flash { border-left-color: #3b82f6; }
-    .kpi-card.save { border-left-color: #8b5cf6; }
-    .kpi-title { font-size: 0.75rem; font-weight: 700; color: #6b7280; text-transform: uppercase; margin-bottom: 6px; }
-    .kpi-val { font-size: 1.8rem; font-weight: 800; color: #111827; }
-    .grid-main { display: grid; grid-template-columns: 360px 1fr; gap: 20px; align-items: start; }
-    .card { background: white; padding: 22px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
-    .card h2 { font-size: 1.05rem; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; color: #111827; }
-    .btn-scan { width: 100%; background: #1e293b; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: 600; cursor: pointer; margin-bottom: 16px; font-size: 0.9rem; transition: 0.2s; }
-    .btn-scan:hover { background: #0f172a; }
-    .form-group { margin-bottom: 12px; }
-    .form-group label { display: block; font-size: 0.82rem; font-weight: 600; color: #374151; margin-bottom: 4px; }
-    .form-group input, .form-group select { width: 100%; padding: 9px 11px; border: 1px solid #d1d5db; border-radius: 7px; font-size: 0.9rem; }
-    .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .btn-submit { width: 100%; background: #16a34a; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: 700; cursor: pointer; margin-top: 8px; font-size: 0.95rem; }
-    .btn-submit:hover { background: #15803d; }
-    table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
-    th { text-align: left; padding: 10px; border-bottom: 2px solid #e5e7eb; color: #4b5563; font-weight: 700; }
-    td { padding: 12px 10px; border-bottom: 1px solid #f3f4f6; vertical-align: middle; }
-    .badge { padding: 4px 9px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; display: inline-block; }
-    .b-ok { background: #dcfce7; color: #166534; }
-    .b-flash { background: #fef3c7; color: #92400e; }
-    .b-donate { background: #fee2e2; color: #991b1b; }
-    .btn-act { border: none; padding: 6px 10px; border-radius: 6px; font-size: 0.78rem; font-weight: 600; cursor: pointer; margin-right: 4px; }
-    .btn-flash { background: #2563eb; color: white; }
-    .btn-don { background: #dc2626; color: white; }
-    .hidden { display: none; }
-    .consumer-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 18px; margin-top: 16px; }
-    .offer-card { background: white; border-radius: 12px; padding: 18px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border-top: 4px solid #2563eb; }
-    .offer-tag { background: #dbeafe; color: #1e40af; font-size: 0.75rem; font-weight: 700; padding: 3px 8px; border-radius: 6px; display: inline-block; margin-bottom: 8px; }
-    .price-old { text-decoration: line-through; color: #9ca3af; font-size: 0.9rem; margin-right: 8px; }
-    .price-new { color: #16a34a; font-size: 1.3rem; font-weight: 800; }
-    .btn-reserve { width: 100%; background: #1b7a43; color: white; border: none; padding: 10px; border-radius: 7px; font-weight: 600; cursor: pointer; margin-top: 12px; }
-  </style>
+<meta charset="UTF-8"><title>EcoSthock | Control Inteligente de Mermas</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,sans-serif}body{background:#f3f6f8;color:#1f2937}
+header{background:#1b7a43;color:#fff;padding:14px 32px;display:flex;justify-content:space-between;align-items:center}
+.nav-btn{border:none;padding:8px 16px;border-radius:6px;font-weight:700;cursor:pointer;margin-left:8px}
+.active{background:#fff;color:#1b7a43}.inactive{background:rgba(255,255,255,.2);color:#fff}
+.wrap{max-width:1100px;margin:24px auto;padding:0 16px}.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+.kpi{background:#fff;padding:16px;border-radius:10px;border-left:4px solid #1b7a43;box-shadow:0 2px 6px rgba(0,0,0,.04)}
+.kpi small{color:#6b7280;font-weight:700;font-size:11px;display:block}.kpi b{font-size:26px}
+.grid{display:grid;grid-template-columns:340px 1fr;gap:20px}.card{background:#fff;padding:20px;border-radius:10px;box-shadow:0 2px 6px rgba(0,0,0,.04)}
+.btn{width:100%;padding:10px;border:none;border-radius:7px;font-weight:700;cursor:pointer;color:#fff;margin-top:8px}
+input,select{width:100%;padding:8px;border:1px solid #d1d5db;border-radius:6px;margin:4px 0 10px}
+table{width:100%;border-collapse:collapse;font-size:14px;margin-top:10px}th,td{padding:10px;text-align:left;border-bottom:1px solid #eee}
+.tag{padding:3px 8px;border-radius:12px;font-size:11px;font-weight:700}.flash{background:#fef3c7;color:#92400e}.don{background:#fee2e2;color:#991b1b}
+.hide{display:none}.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px;margin-top:14px}
+</style>
 </head>
 <body>
-  <header>
-    <div class="brand">🌱 EcoSthock <span>Control Inteligente de Mermas</span></div>
-    <div class="nav-btns">
-      <button id="btnComercio" class="nav-btn active" onclick="cambiarVista('comercio')">🏪 Panel Comerciante</button>
-      <button id="btnConsumidor" class="nav-btn inactive" onclick="cambiarVista('consumidor')">🛒 Vista Consumidor</button>
-    </div>
-  </header>
-
-  <div id="vistaComercio" class="container">
-    <div class="kpis">
-      <div class="kpi-card"><div class="kpi-title">Lotes Monitoreados</div><div id="kpiLotes" class="kpi-val">0</div></div>
-      <div class="kpi-card warn"><div class="kpi-title">Alertas (&lt; 72 hrs)</div><div id="kpiAlertas" class="kpi-val">0</div></div>
-      <div class="kpi-card flash"><div class="kpi-title">Ofertas Flash Activas</div><div id="kpiFlash" class="kpi-val">0</div></div>
-      <div class="kpi-card save"><div class="kpi-title">Ahorro / Rescate Estimado</div><div id="kpiAhorro" class="kpi-val">$0</div></div>
-    </div>
-
-    <div class="grid-main">
-      <div class="card">
-        <h2>📷 Alta Rápida de Lote</h2>
-        <button type="button" class="btn-scan" onclick="simularEscaneo()">⚡ Simular Escaneo de Código QR/Barras</button>
-        <form onsubmit="registrarProducto(event)">
-          <div class="form-group"><label>Código de Barras</label><input id="codigo" type="text" placeholder="Ej. 7501001234567" required /></div>
-          <div class="form-group"><label>Producto</label><input id="producto" type="text" placeholder="Ej. Pan Integral Artesanal" required /></div>
-          <div class="form-group">
-            <label>Categoría</label>
-            <select id="categoria">
-              <option>Panadería</option>
-              <option>Lácteos</option>
-              <option>Frutas y Verduras</option>
-              <option>Abarrotes</option>
-            </select>
-          </div>
-          <div class="row-2">
-            <div class="form-group"><label>Cantidad (Unidades)</label><input id="cantidad" type="number" value="10" min="1" required /></div>
-            <div class="form-group"><label>Precio Base ($ MXN)</label><input id="precio" type="number" value="50" min="1" required /></div>
-          </div>
-          <div class="form-group">
-            <label>Horas restantes para caducar</label>
-            <select id="horas">
-              <option value="72">72 horas (Normal)</option>
-              <option value="48" selected>48 horas (Preventivo)</option>
-              <option value="24">24 horas (Urgente - Descuento Flash)</option>
-              <option value="6">6 horas (Crítico - Donación)</option>
-            </select>
-          </div>
-          <button type="submit" class="btn-submit">Registrar en Inventario</button>
-        </form>
-      </div>
-
-      <div class="card">
-        <h2>📦 Inventario y Alertas en Tiempo Real</h2>
-        <table>
-          <thead>
-            <tr><th>Producto</th><th>Cant.</th><th>Caducidad</th><th>Estado</th><th>Acciones Rápidas</th></tr>
-          </thead>
-          <tbody id="tablaInventario">
-            <tr><td colspan="5" style="text-align:center;color:#9ca3af;padding:24px;">Aún no hay lotes registrados. Usa el simulador de escaneo.</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
+<header>
+  <div><b>🌱 EcoSthock</b> | Control Inteligente de Mermas</div>
+  <div>
+    <button id="b1" class="nav-btn active" onclick="ver(1)">🏪 Panel Comerciante</button>
+    <button id="b2" class="nav-btn inactive" onclick="ver(2)">🛒 Vista Consumidor</button>
   </div>
-
-  <div id="vistaConsumidor" class="container hidden">
+</header>
+<div id="v1" class="wrap">
+  <div class="kpis">
+    <div class="kpi"><small>LOTES MONITOREADOS</small><b id="k1">0</b></div>
+    <div class="kpi" style="border-color:#f59e0b"><small>ALERTAS (&lt; 72 HRS)</small><b id="k2">0</b></div>
+    <div class="kpi" style="border-color:#3b82f6"><small>OFERTAS FLASH ACTIVAS</small><b id="k3">0</b></div>
+    <div class="kpi" style="border-color:#8b5cf6"><small>AHORRO / RESCATE</small><b id="k4">$0</b></div>
+  </div>
+  <div class="grid">
     <div class="card">
-      <h2>🛒 Ofertas Flash Cercanas — Rescata Alimentos con hasta 50% de Descuento</h2>
-      <p style="font-size:0.9rem;color:#6b7280;margin-top:4px;">Productos frescos próximos a vencer publicados en tiempo real por comercios locales afiliados a EcoSthock.</p>
-      <div id="gridOfertas" class="consumer-grid"></div>
+      <h3>📷 Alta Rápida de Lote</h3>
+      <button type="button" class="btn" style="background:#1e293b;margin-bottom:10px" onclick="scan()">⚡ Simular Escaneo QR/Barras</button>
+      <label>Código</label><input id="cod" placeholder="7501001234567">
+      <label>Producto</label><input id="prod" placeholder="Pan Integral Artesanal">
+      <label>Categoría</label><select id="cat"><option>Panadería</option><option>Lácteos</option><option>Frutas y Verduras</option></select>
+      <label>Cantidad</label><input id="cant" type="number" value="10">
+      <label>Precio Base ($ MXN)</label><input id="prec" type="number" value="50">
+      <label>Caducidad</label><select id="hrs"><option value="24">24 hrs (Oferta Flash -50%)</option><option value="48">48 hrs (Preventivo)</option><option value="6">6 hrs (Donación)</option></select>
+      <button type="button" class="btn" style="background:#16a34a" onclick="add()">Registrar en Inventario</button>
+    </div>
+    <div class="card">
+      <h3>📦 Inventario y Alertas en Tiempo Real</h3>
+      <table><thead><tr><th>Producto</th><th>Cant.</th><th>Caducidad</th><th>Estado</th></tr></thead><tbody id="tb"><tr><td colspan="4" style="color:#999;text-align:center;padding:20px">Sin lotes registrados</td></tr></tbody></table>
     </div>
   </div>
-
-  <script>
-    const muestras = [
-      { c: '7501001234567', p: 'Pan Integral Artesanal', cat: 'Panadería', cant: 8, pr: 55, h: '24' },
-      { c: '7501099881122', p: 'Queso Panela Fresco 400g', cat: 'Lácteos', cant: 5, pr: 80, h: '48' },
-      { c: '7502233445566', p: 'Baguette Rústica Recién Horneada', cat: 'Panadería', cant: 12, pr: 35, h: '6' },
-      { c: '7503344556677', p: 'Yogurt Natural Griego 1L', cat: 'Lácteos', cant: 6, pr: 68, h: '24' }
-    ];
-    let idx = 0;
-    let inventario = [];
-
-    function simularEscaneo() {
-      const m = muestras[idx % muestras.length];
-      document.getElementById('codigo').value = m.c;
-      document.getElementById('producto').value = m.p;
-      document.getElementById('categoria').value = m.cat;
-      document.getElementById('cantidad').value = m.cant;
-      document.getElementById('precio').value = m.pr;
-      document.getElementById('horas').value = m.h;
-      idx++;
-    }
-
-    function registrarProducto(e) {
-      e.preventDefault();
-      const h = parseInt(document.getElementById('horas').value);
-      let estado = 'Monitoreo';
-      if (h <= 6) estado = 'Donación Banco Alimentos';
-      else if (h <= 24) estado = 'Oferta Flash (-50%)';
-      else if (h <= 48) estado = 'Alerta Preventiva';
-
-      inventario.push({
-        id: Date.now(),
-        producto: document.getElementById('producto').value,
-        categoria: document.getElementById('categoria').value,
-        cantidad: parseInt(document.getElementById('cantidad').value),
-        precio: parseFloat(document.getElementById('precio').value),
-        horas: h,
-        estado: estado
-      });
-      e.target.reset();
-actualizarUI();
-}
-function cambiarEstado(id, nuevoEstado) {
-const item = inventario.find(i => i.id === id);
-if (item) { item.estado = nuevoEstado; actualizarUI(); }
-}
-function reservarOferta(id) {
-const item = inventario.find(i => i.id === id);
-if (item && item.cantidad > 0) {
-item.cantidad--;
-alert('¡Reserva confirmada! Muestra tu código QR en tienda para recoger: ' + item.producto);
-actualizarUI();
-}
-}
-function actualizarUI() {
-const tbody = document.getElementById('tablaInventario');
-tbody.innerHTML = '';
-let alertas = 0, flash = 0, ahorro = 0;
-inventario.forEach(item => {
-if (item.horas <= 48) alertas++;
-if (item.estado.includes('Flash')) { flash++; ahorro += (item.precio * 0.5) * item.cantidad; }
-if (item.estado.includes('Donación')) { ahorro += item.precio * item.cantidad; }
-let badgeClass = 'b-ok';
-if (item.estado.includes('Flash') || item.estado.includes('Alerta')) badgeClass = 'b-flash';
-if (item.estado.includes('Donación')) badgeClass = 'b-donate';
-tbody.innerHTML += `
-\({item.producto}</strong><br><small style="color:#6b7280">\){item.categoria}
-${item.cantidad} u.${item.horas} hrs${item.estado}`;
-});
-document.getElementById('kpiLotes').innerText = inventario.length;
-document.getElementById('kpiAlertas').innerText = alertas;
-document.getElementById('kpiFlash').innerText = flash;
-document.getElementById('kpiAhorro').innerText = '$' + ahorro.toFixed(0);
-const grid = document.getElementById('gridOfertas');
-const ofertas = inventario.filter(i => i.estado.includes('Flash') && i.cantidad > 0);
-grid.innerHTML = ofertas.length ? '' : 'No hay ofertas flash activas aún. Activa una desde el Panel Comerciante.';
-ofertas.forEach(o => {
-grid.innerHTML +=  <div class="offer-card"> <span class="offer-tag">⚡ -50% OFF • Quedan ${o.cantidad} u.</span> <h3>${o.producto}</h3> <p style="font-size:0.82rem;color:#6b7280;margin:4px 0 10px;">Categoría: ${o.categoria} • Vence en ${o.horas} hrs</p> <div><span class="price-old">$${o.precio} MXN</span><span class="price-new">$${(o.precio * 0.5).toFixed(0)} MXN</span></div> <button class="btn-reserve" onclick="reservarOferta(${o.id})">Apartar Producto</button> </div>;
-});
-}
-function cambiarVista(vista) {
-document.getElementById('vistaComercio').classList.toggle('hidden', vista !== 'comercio');
-document.getElementById('vistaConsumidor').classList.toggle('hidden', vista !== 'consumidor');
-document.getElementById('btnComercio').className = 'nav-btn ' + (vista === 'comercio' ? 'active' : 'inactive');
-document.getElementById('btnConsumidor').className = 'nav-btn ' + (vista === 'consumidor' ? 'active' : 'inactive');
-}
+</div>
+<div id="v2" class="wrap hide">
+  <div class="card">
+    <h3>🛒 Ofertas Flash Cercanas — Rescata Alimentos con 50% OFF</h3>
+    <div id="of" class="cards"></div>
+  </div>
+</div>
+<script>
+const m=[{c:'7501001234567',p:'Pan Integral Artesanal',g:'Panadería',n:8,r:55,h:'24'},{c:'7501099881122',p:'Queso Panela 400g',g:'Lácteos',n:5,r:80,h:'24'},{c:'7502233445566',p:'Baguette Rústica',g:'Panadería',n:12,r:35,h:'6'}];
+let i=0,db=[];
+function scan(){const x=m[i++%m.length];cod.value=x.c;prod.value=x.p;cat.value=x.g;cant.value=x.n;prec.value=x.r;hrs.value=x.h}
+function add(){if(!prod.value)return;const h=+hrs.value;db.push({p:prod.value,g:cat.value,n:+cant.value,r:+prec.value,h,e:h<=6?'Donación Banco':h<=24?'Oferta Flash (-50%)':'Preventivo'});cod.value='';prod.value='';render()}
+function render(){tb.innerHTML=db.map(x=>`<tr><td><b>${x.p}</b><br><small>${x.g}</small></td><td>${x.n} u.</td><td>${x.h} hrs</td><td><span class="tag ${x.h<=6?'don':'flash'}">${x.e}</span></td></tr>`).join('');k1.innerText=db.length;k2.innerText=db.length;k3.innerText=db.filter(x=>x.h===24).length;k4.innerText='$'+db.reduce((a,x)=>a+x.r*x.n*.5,0);of.innerHTML=db.filter(x=>x.h<=24).map(x=>`<div class="card" style="border-top:4px solid #2563eb"><b>${x.p}</b><p style="font-size:12px;color:#666">${x.g} • Vence en ${x.h}h</p><p style="margin:8px 0"><s style="color:#999">$${x.r}</s> <b style="color:#16a34a;font-size:20px">$${x.r/2} MXN</b></p><button class="btn" style="background:#1b7a43" onclick="alert('¡Apartado con éxito!')">Apartar</button></div>`).join('')||'<p>Registra productos primero</p>'}
+function ver(n){v1.classList.toggle('hide',n!==1);v2.classList.toggle('hide',n!==2);b1.className='nav-btn '+(n===1?'active':'inactive');b2.className='nav-btn '+(n===2?'active':'inactive')}
+</script>
+</body>
+</html>
